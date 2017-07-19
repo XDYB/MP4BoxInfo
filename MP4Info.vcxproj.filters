@@ -19,6 +19,9 @@
     <Filter Include="控件">
       <UniqueIdentifier>{e1475d23-bfa8-49cb-b993-0515573a9aea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lua">
+      <UniqueIdentifier>{77087481-cee7-405d-81e1-6dd38c6326fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -66,6 +69,9 @@
     <ClInclude Include="src\MPEG4Container.h">
       <Filter>MP4</Filter>
     </ClInclude>
+    <ClInclude Include="luaFunction.h">
+      <Filter>lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MP4Info.cpp">
@@ -94,6 +100,9 @@
     </ClCompile>
     <ClCompile Include="src\MPEG4Container.cpp">
       <Filter>MP4</Filter>
+    </ClCompile>
+    <ClCompile Include="luaFunction.cpp">
+      <Filter>lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

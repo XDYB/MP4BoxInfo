@@ -155,5 +155,16 @@ static const char * CONTAINERS_LIST[20] = {
 	  return false;
   }
 
+  static const char * TypeString[] = {
+	  "Box",
+	  "Container",
+	  "ContainerLeaf",
+	  "None"
+  };
+
+  inline const char * TypeName(Type t)
+  {
+	  return TypeString[t];
+  }
 };  // End of namespace constants
 

@@ -25,21 +25,6 @@ namespace MP4{
 		uint64_t largesize;
 	};
 
-	struct UUIDBox
-	{
-		uint32_t size;
-		uint32_t type;      // == 'uuid'
-		uint8_t uuids[UUID_LENGTH];
-	};
-
-	struct LargeUUIDBox
-	{
-		uint32_t size;    // == 1
-		uint32_t type;    // == 'uuid'
-		uint64_t largesize;
-		uint8_t uuids[UUID_LENGTH];
-	};
-
 	struct FullBox
 	{
 		uint32_t size;
@@ -57,25 +42,6 @@ namespace MP4{
 		uint64_t largesize;
 	};
 
-	struct UUIDFullBox
-	{
-		uint32_t size;
-		uint32_t type;      // == 'uuid'
-		uint32_t version : 8;
-		uint32_t flag : 24;
-		uint8_t uuids[UUID_LENGTH];
-	};
-
-	struct LargeUUIDFullBox
-	{
-		uint32_t size;    // == 1
-		uint32_t type;    // == 'uuid'
-		uint32_t version : 8;
-		uint32_t flag : 24;
-		uint64_t largesize;
-		uint8_t uuids[UUID_LENGTH];
-	};
-
 #pragma pack() 
 
 #define BOX_NAME_LENGTH 4
@@ -90,6 +56,8 @@ public:
 	uint64_t  size();
 	const char *name();
 	uint64_t position();
+	uint32_t header();
+	uint64_t contentSize();
 	virtual uint64_t contentPosition();
 	virtual constants::Type type();
 protected:

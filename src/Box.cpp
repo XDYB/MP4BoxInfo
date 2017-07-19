@@ -58,6 +58,11 @@ uint64_t  Box::size()
 	return m_iHeaderSize + m_iContentSize;
 }
 
+uint32_t Box::header()
+{
+	return m_iHeaderSize;
+}
+
 const char *Box::name()
 {
 	return m_name;
@@ -71,6 +76,11 @@ uint64_t Box::position()
 uint64_t Box::contentPosition()
 {
 	return m_iPosition + m_iHeaderSize;
+}
+
+uint64_t Box::contentSize()
+{
+	return m_iContentSize;
 }
 
 constants::Type Box::type()

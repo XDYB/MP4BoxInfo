@@ -32,9 +32,12 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 private:
 	void Close();
+	void ClearControl();
 	void OpenMPEG(CString file);
 	void ClearTree();
 	void BuildTree();
+	void PauseHeader(Box *box);
+	void PauseContent(Box *box, char* buffer, uint64_t size);
 	void ParseBox(Box *box);
 private:
 	CHexEdit m_edHexInfo;   // 显示十六进制
@@ -56,8 +59,9 @@ protected:
 public:
 	CTreeCtrl m_tree;
 	CStatic m_filePath;
+	CListBox m_boxInfo;
+	CEdit m_boxStruct;
 	afx_msg void OnBnClickedBtnOpen();
 	afx_msg void OnNMCustomdrawTreeBox(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTvnItemChangedTreeBox(NMHDR *pNMHDR, LRESULT *pResult);
-	
 };

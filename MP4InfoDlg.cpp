@@ -7,6 +7,7 @@
 #include "MP4InfoDlg.h"
 #include "afxdialogex.h"
 #include <list>
+#include "luaFunction.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -70,6 +71,8 @@ void CMP4InfoDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_HEX, m_edHexInfo);
 	DDX_Control(pDX, IDC_TREE_BOX, m_tree);
 	DDX_Control(pDX, IDC_FILE_PATH, m_filePath);
+	DDX_Control(pDX, IDC_LIST_BOX, m_boxInfo);
+	DDX_Control(pDX, IDC_LIST_STRUCT, m_boxStruct);
 }
 
 BEGIN_MESSAGE_MAP(CMP4InfoDlg, CDialogEx)
@@ -184,6 +187,19 @@ void CMP4InfoDlg::OnBnClickedBtnOpen()
 	}
 }
 
+void CMP4InfoDlg::ClearControl()
+{
+	ClearTree();
+
+	m_edHexInfo.SetData(buffer, 0);
+	::SendMessage(GetDlgItem(IDC_EDIT_HEX)->m_hWnd, WM_KILLFOCUS, -1, 0); // 不要控件焦点
+
+	size_t count = m_boxInfo.GetCount();
+	for (size_t i = 0; i < count; i++) {
+		m_boxInfo.DeleteString(0);
+	}
+}
+
 void CMP4InfoDlg::Close()
 {
 	in.close();
@@ -202,12 +218,9 @@ void CMP4InfoDlg::OpenMPEG(CString file)
 		return;
 	}
 
-	ClearTree();
+	ClearControl();
 	Close();
-
-	m_edHexInfo.SetData(buffer, 0);
-	::SendMessage(GetDlgItem(IDC_EDIT_HEX)->m_hWnd, WM_KILLFOCUS, -1, 0); // 不要控件焦点
-
+	
 	m_filePath.SetWindowText(file);
 	std::string name = toString(file.GetBuffer());
 	in = std::fstream(name.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
@@ -258,24 +271,101 @@ void CMP4InfoDlg::BuildTree()
 	}
 }
 
+void CMP4InfoDlg::PauseHeader(Box *box)
+{
+	size_t count = m_boxInfo.GetCount();
+	for (size_t i = 0; i < count; i++) {
+		m_boxInfo.DeleteString(0);
+	}
+
+	CString str;
+	str = _T("Name:");
+	str += AToString(box->name()).c_str();
+	m_boxInfo.AddString(str);
+
+	constants::Type type = box->type();
+	str = _T("Type:");
+	str += AToString(constants::TypeName(type)).c_str();
+	m_boxInfo.AddString(str);
+
+	if (type == constants::Container)
+	{
+		Container * container = (Container*)box;
+		if (container->Padding() > 0)
+		{
+			str.Format(_T("    Content Padding:%d"), container->Padding());
+			m_boxInfo.AddString(str);
+		}
+
+		std::vector<Box *>& contents = container->Contents();
+		str.Format(_T("    Contents:%d"), contents.size());
+
+		m_boxInfo.AddString(str);
+		str = _T("    Contents:");
+
+		for (size_t i = 0; i < contents.size(); i++)
+		{
+			str.AppendFormat(_T(" %s "), AToString(contents[i]->name()).c_str());
+		}
+		m_boxInfo.AddString(str);
+	}
+	str.Format(_T("Position:%lld"), box->position());
+	m_boxInfo.AddString(str);
+	
+	str.Format(_T("Size:%lld (%08X)"), box->size(), box->size());
+	m_boxInfo.AddString(str);
+
+	str.Format(_T("Header Size:%d"), box->header());
+	m_boxInfo.AddString(str);
+
+	str.Format(_T("ContentPosition:%lld"), box->contentPosition());
+	m_boxInfo.AddString(str);
+
+	str.Format(_T("ContentSize:%lld (%08X)"), box->contentSize(), box->contentSize());
+	m_boxInfo.AddString(str);
+}
+
+void CMP4InfoDlg::PauseContent(Box *box,char* buffer,uint64_t size)
+{
+	m_boxStruct.SetWindowText(_T(""));
+
+	CString strResult;
+	std::vector<std::string > result = LuaParseBoxContent(box->name(),buffer,size);
+	if (result.size() > 0)
+	{
+		for (size_t i = 0; i < result.size(); i++)
+		{
+			strResult.AppendFormat(_T("%s\r\n"), AToString(result[i]).c_str());
+		}
+	}
+	m_boxStruct.SetWindowText(strResult);
+}
+
 void CMP4InfoDlg::ParseBox(Box *box)
 {
+	PauseHeader(box);
 	Stream.seekg(box->position());
 	uint64_t size = box->size();
 	if (size > 1024 * 1024)
 	{
 		m_edHexInfo.SetData(buffer, 0);
 		::SendMessage(GetDlgItem(IDC_EDIT_HEX)->m_hWnd, WM_KILLFOCUS, -1, 0); // 不要控件焦点
+
+		m_boxStruct.SetWindowText(_T(""));
+
 		return;
 	}
 	Stream.read((char*)buffer,size);
 	m_edHexInfo.SetData(buffer,size);
 	::SendMessage(GetDlgItem(IDC_EDIT_HEX)->m_hWnd, WM_KILLFOCUS, -1, 0); // 不要控件焦点
+
+	PauseContent(box, (char*)buffer, size);
 }
 
 void CMP4InfoDlg::OnNMCustomdrawTreeBox(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	COLORREF clrNewTextColor, clrNewBkColor;
+	COLORREF clrNewTextColor;
+	//COLORREF clrNewBkColor;
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	LPNMTVCUSTOMDRAW lpnmcd = (LPNMTVCUSTOMDRAW)pNMCD;
 	// Take the default processing unless we set this to something else below.
@@ -287,7 +377,7 @@ void CMP4InfoDlg::OnNMCustomdrawTreeBox(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		*pResult = CDRF_NOTIFYITEMDRAW;
 	}
-	else if (CDDS_ITEMPREPAINT | CDDS_SUBITEM == lpnmcd->nmcd.dwDrawStage)
+	else if ((CDDS_ITEMPREPAINT) == lpnmcd->nmcd.dwDrawStage)
 	{
 		// This is the notification message for an item.  We'll request
 		// notifications before each subitem's prepaint stage.
