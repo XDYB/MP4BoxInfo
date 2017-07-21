@@ -134,7 +134,7 @@ end
 -- http://www.ftyps.com/composite.htm#6.3
 -- http://blog.csdn.net/dxpqxb/article/details/42266779
 function Parse(data)
-  local result = {}
+  local result = ""
   local size = string.len(data)
   --Box Header
   local index = 8
@@ -144,12 +144,12 @@ function Parse(data)
   then
     local major_brand = string.sub(data,index + 1,index + 4)
     print("标示:  ".. major_brand)
-    table.insert(result,"标示:  ".. major_brand)
+    result = result .. "标示:  ".. major_brand.."\r\n"
     local ftypDes = FindDescription(major_brand)
     print("         描述:  ".. ftypDes[2])
-    table.insert(result,"         描述:  ".. ftypDes[2])
+    result = result .."         描述:  ".. ftypDes[2].."\r\n"
     print("         MIME类型:  ".. ftypDes[3])
-    table.insert(result,"         MIME类型:  ".. ftypDes[3])
+    result = result .."         MIME类型:  ".. ftypDes[3].."\r\n"
     index = index + 4
   end
   -- 版本 minor_version
@@ -158,7 +158,7 @@ function Parse(data)
     local minor_version = string.sub(data,index + 1,index + 4)
     index = index + 4;
     print("版本:  0x"..HEX(minor_version,4))
-    table.insert(result,"版本:  0x"..HEX(minor_version,4))
+    result = result .."版本:  0x"..HEX(minor_version,4).."\r\n"
   end
   -- 兼容标示 compatible_brands
   if (index < size)
@@ -175,16 +175,17 @@ function Parse(data)
       end
     end
     print(str)
-    table.insert(result,str)
+    result = result ..str.."\r\n"
   end
 
-  table.insert(result,"----------------------------------------------------------------")
-  table.insert(result,"讲解地址")
-  table.insert(result,"http://www.ftyps.com/")
-  table.insert(result,"http://www.ftyps.com/composite.htm#6.3")
-  table.insert(result,"http://blog.csdn.net/dxpqxb/article/details/42266779")
+  result = result .."----------------------------------------------------------------".."\r\n"
+  result = result .."讲解地址:".."\r\n"
+  result = result .."http://l.web.umkc.edu/lizhu/teaching/2016sp.video-communication/ref/mp4.pdf".."\r\n"
+  result = result .."http://www.ftyps.com/".."\r\n"
+  result = result .."http://www.ftyps.com/composite.htm#6.3".."\r\n"
+  result = result .."http://blog.csdn.net/dxpqxb/article/details/42266779".."\r\n"
 
-  return result;
+  return {result};
 end
 
 function parse(name,data)
