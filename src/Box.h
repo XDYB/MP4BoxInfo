@@ -37,9 +37,9 @@ namespace MP4{
 	{
 		uint32_t size;      // == 1
 		uint32_t type;
+		uint64_t largesize;
 		uint32_t version : 8;
 		uint32_t flag : 24;
-		uint64_t largesize;
 	};
 
 #pragma pack() 

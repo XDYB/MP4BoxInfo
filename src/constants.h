@@ -39,15 +39,26 @@ static const char *TAG_SA3D = "SA3D";
 
 // Container types.
 static const char *TAG_MOOV = "moov";
-static const char *TAG_UDTA = "udta";
-static const char *TAG_META = "meta";
+static const char *TAG_EDTS = "edts";
 static const char *TAG_TRAK = "trak";
 static const char *TAG_MDIA = "mdia";
 static const char *TAG_MINF = "minf";
+static const char *TAG_DINF = "dinf";
 static const char *TAG_STBL = "stbl";
+static const char *TAG_MVEX = "mvex";
+static const char *TAG_MOOF = "moof";
+static const char *TAG_TRAF = "traf";
+static const char *TAG_MFRA = "mfra";
+static const char *TAG_META = "meta";
+static const char *TAG_UDTA = "udta";
+static const char *TAG_IPRO = "ipro";
+static const char *TAG_SINF = "sinf";
 static const char *TAG_STSD = "stsd";
+
 static const char *TAG_UUID = "uuid";
 static const char *TAG_WAVE = "wave";
+
+static const char *TAG_DREF = "dref";
 
 // Sound sample descriptions.
 static const char *TAG_NONE = "NONE";
@@ -63,7 +74,7 @@ static const char *TAG_ALAW = "alaw";
 static const char *TAG_LPCM = "lpcm";
 static const char *TAG_MP4A = "mp4a";
 
-static const char * LEAF_LIST[10] = {
+static const char * LEAF_LIST[] = {
 	TAG_STCO,
 	TAG_CO64,
 	TAG_FREE,
@@ -76,7 +87,12 @@ static const char * LEAF_LIST[10] = {
 	TAG_SA3D
 };
 
-static const char * SOUND_SAMPLE_DESCRIPTIONS[12] = {
+static const char * PADDING_LIST[] = {
+	TAG_STSD,
+	TAG_DREF
+};
+
+static const char * SOUND_SAMPLE_DESCRIPTIONS[] = {
     TAG_NONE,
     TAG_RAW_,
     TAG_TWOS,
@@ -91,7 +107,7 @@ static const char * SOUND_SAMPLE_DESCRIPTIONS[12] = {
     TAG_MP4A
 };
 
-static const char * CONTAINERS_LIST[20] = {
+static const char * CONTAINERS_LIST[] = {
     TAG_MDIA,
     TAG_MINF,
     TAG_MOOV,
@@ -100,6 +116,16 @@ static const char * CONTAINERS_LIST[20] = {
     TAG_TRAK,
     TAG_UDTA,
     TAG_WAVE,
+	TAG_EDTS,
+	TAG_DINF,
+	TAG_MVEX,
+	TAG_MOOF,
+	TAG_TRAF,
+	TAG_MFRA,
+	TAG_IPRO,
+	TAG_SINF,
+	TAG_DREF,
+	TAG_META,
 
     TAG_NONE,
     TAG_RAW_,
@@ -127,6 +153,16 @@ static const char * CONTAINERS_LIST[20] = {
 	  int32_t iArrSize = (int32_t)(sizeof(constants::LEAF_LIST) / sizeof(constants::LEAF_LIST[0]));
 	  for (int32_t i = 0; i < iArrSize; i++) {
 		  if (memcmp(name, constants::LEAF_LIST[i], 4) == 0) {
+			  return true;
+		  }
+	  }
+	  return false;
+  }
+  inline bool IS_PADDING_LIST(const char * name)
+  {
+	  int32_t iArrSize = (int32_t)(sizeof(constants::PADDING_LIST) / sizeof(constants::PADDING_LIST[0]));
+	  for (int32_t i = 0; i < iArrSize; i++) {
+		  if (memcmp(name, constants::PADDING_LIST[i], 4) == 0) {
 			  return true;
 		  }
 	  }

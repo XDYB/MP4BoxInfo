@@ -1,4 +1,3 @@
-
 function RawWrite(name,data)
   local filename = "./luaScript/data/"..name..".raw";
 	local file = io.open(filename, "wb");
@@ -42,8 +41,7 @@ end
 
 function Parse(name,data)
   local size = string.len(data)
-  local result = "Full Box:\r\n"
-  --Full Box
+  local result = ""
   --Box Header
   local index = 8
   local version = string.sub(data,index + 1,index + 1);
@@ -56,8 +54,7 @@ function Parse(name,data)
   result = result.."       Flag:"..flags.."\r\n"
   index = index + 3
   --Box Data
-  result = result.."Box Data:\r\n"
-  if(version == 0)
+  if (version == 0)
   then
     creation_time = string.sub(data,index + 1,index + 4)
     index = index + 4
@@ -92,44 +89,31 @@ function Parse(name,data)
     result = result.."       duration: (0x"..HEX(duration,8)..") "..Integer(duration,8).."\r\n"
   end
 
-  rate = string.sub(data,index + 1,index + 4)
-  index = index + 4
-  result = result.."       rate: (0x"..HEX(rate,4)..") "..Integer(rate,4).."\r\n"
-
-  volume  = string.sub(data,index + 1,index + 2)
+  local language = string.sub(data,index + 1,index + 2)
   index = index + 2
-  result = result.."       volume: (0x"..HEX(volume,2)..") "..Integer(volume,2).."\r\n"
+  result = result.."       language: (0x"..HEX(language,2)..") "..Integer(language,2).."\r\n"
 
-  -- const bit(16)  reserved = 0;
-  reserved  = string.sub(data,index + 1,index + 2)
-  result = result.."       reserved: (0x"..HEX(reserved,2)..") ".."\r\n"
+  result = result.."       {\r\n"
+  language = Integer(language,2)
+  local pad = bit32.rshift(bit32.band(language,0x00008000),15)
+  local language1 = bit32.rshift(bit32.band(language,0x00007C00),10)
+  local language2 = bit32.rshift(bit32.band(language,0x000003E0),5)
+  local language3 = bit32.band(language,0x0000001F)
+  result = result .."       pad(1b):" .. pad .."\r\n"
+  result = result .."       language1(5b):" .. language1 .."\r\n"
+  result = result .."       language2(5b):" .. language2 .."\r\n"
+  result = result .."       language3(5b):" .. language3 .."\r\n"
+  result = result.."       }\r\n"
+
+
+  local pre_defined = string.sub(data,index + 1,index + 2)
   index = index + 2
-
-  -- const unsigned int(32)[2]  reserved = 0;
-  reserved  = string.sub(data,index + 1,index + 4*2)
-  result = result.."       reserved: (0x"..HEX(reserved,4*2)..") ".."\r\n"
-  index = index + 4*2
-
-  -- template int(32)[9]  matrix = { 0x00010000,0,0,0,0x00010000,0,0,0,0x40000000 };
-  matrix  = string.sub(data,index + 1,index + 4*9)
-  result = result.."       matrix: (0x"..HEX(matrix,4*9)..") ".."\r\n"
-  index = index + 4*9
-
-  -- bit(32)[6]  pre_defined = 0;
-  pre_defined  = string.sub(data,index + 1,index + 4*6)
-  result = result.."       pre_defined: (0x"..HEX(pre_defined,4*6)..") ".."\r\n"
-  index = index + 4*6
-
-  next_track_ID = string.sub(data,index + 1,index + 4)
-  result = result.."       next_track_ID: (0x"..HEX(next_track_ID,4)..") "..Integer(next_track_ID,4).."\r\n"
-  index = index + 4
-
-  -- result = result.."       index:"..index.." size:"..size.."\r\n"
+  result = result.."       pre_defined: (0x"..HEX(pre_defined,2)..") "..Integer(pre_defined,2).."\r\n"
+  --
+  -- -- result = result.."       index:"..index.." size:"..size.."\r\n"
   result = result.."----------------------------------------------------------------\r\n"
   result = result.."Ω≤Ω‚µÿ÷∑\r\n"
-  result = result.."http://blog.chinaunix.net/uid-20424888-id-3190160.html\r\n"
-  result = result.."http://blog.csdn.net/dxpqxb/article/details/42266811\r\n"
-  result = result.."http://blog.csdn.net/pirateleo/article/details/7590056/\r\n"
+  result = result.."http://l.web.umkc.edu/lizhu/teaching/2016sp.video-communication/ref/mp4.pdf\r\n"
   return {result}
 end
 
@@ -138,6 +122,6 @@ function parse(name,data)
   return Parse(name,data)
 end
 
-local name = "mvhd"
+local name = "mdhd"
 -- local data = RawRead(name)
--- Parse(name,data)
+-- print(Parse(name,data)[1])

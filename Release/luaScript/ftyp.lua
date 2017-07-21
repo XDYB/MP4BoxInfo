@@ -183,12 +183,12 @@ function Parse(data)
   table.insert(result,"http://www.ftyps.com/")
   table.insert(result,"http://www.ftyps.com/composite.htm#6.3")
   table.insert(result,"http://blog.csdn.net/dxpqxb/article/details/42266779")
-  
+
   return result;
 end
 
 function parse(name,data)
-	RawWrite(name,data)
+	-- RawWrite(name,data)
   return Parse(data);
 end
 

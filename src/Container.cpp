@@ -8,8 +8,13 @@ namespace MP4 {
 inline int getPadding(char *name,Stream & fs)
 {
 	uint32_t iPadding = 0;
-	if (memcmp(name, constants::TAG_STSD, BOX_NAME_LENGTH) == 0)
+	if (constants::IS_PADDING_LIST(name))
 		iPadding = 8;
+
+	if (memcmp(name, constants::TAG_META, BOX_NAME_LENGTH) == 0)
+	{
+		iPadding = 4;
+	}
 
 	uint64_t iCurrentPos = fs.tellg();
 	int16_t  iSampleDescVersion = 0;
