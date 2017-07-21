@@ -41,36 +41,37 @@ end
 
 function Parse(name,data)
   local size = string.len(data)
-  local result = ""
+  local result = {}
   --Box Header
   local index = 8
   local version = string.sub(data,index + 1,index + 1);
-  result = result.."       Version:(0x"..HEX(version,1)..") "..Integer(version,1).."\r\n"
+  table.insert(result , "       Version:(0x"..HEX(version,1)..") "..Integer(version,1))
   index = index + 1
   version = Integer(version,1)
 
   local flags = string.sub(data,index + 1,index + 3)
   flags = "0x"..HEX(flags,3)
-  result = result.."       Flag:"..flags.."\r\n"
+  table.insert(result , "       Flag:"..flags)
   index = index + 3
   --Box Data
   entry_count = string.sub(data,index + 1,index + 4)
   index = index + 4
-  result = result.."       entry_count: (0x"..HEX(entry_count,4)..") "..Integer(entry_count,4).."\r\n"
+  table.insert(result , "       entry_count: (0x"..HEX(entry_count,4)..") "..Integer(entry_count,4))
   entry_count = Integer(entry_count,4)
 
 
   for i = 1,entry_count do
     chunk_offset = string.sub(data,index + 1,index + 4)
     index = index + 4
-    result = result.."       chunk_offset: (0x"..HEX(chunk_offset,4)..") "..Integer(chunk_offset,4).."\r\n"
+    table.insert(result , "       chunk_offset: (0x"..HEX(chunk_offset,4)..") "..Integer(chunk_offset,4))
   end
 
   -- -- result = result.."       index:"..index.." size:"..size.."\r\n"
-  result = result.."----------------------------------------------------------------\r\n"
-  result = result.."讲解地址\r\n"
-  result = result.."http://l.web.umkc.edu/lizhu/teaching/2016sp.video-communication/ref/mp4.pdf\r\n"
-  return {result}
+  table.insert(result , "----------------------------------------------------------------")
+  table.insert(result , "讲解地址")
+  table.insert(result , "http://l.web.umkc.edu/lizhu/teaching/2016sp.video-communication/ref/mp4.pdf")
+  local ret = table.concat(result,"\r\n")
+  return {ret}
 end
 
 function parse(name,data)

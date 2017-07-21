@@ -41,41 +41,41 @@ end
 
 function Parse(name,data)
   local size = string.len(data)
-  local result = ""
+  local result = {}
   --Box Header
   local index = 8
   local version = string.sub(data,index + 1,index + 1);
-  result = result.."       Version:(0x"..HEX(version,1)..") "..Integer(version,1).."\r\n"
+  table.insert(result , "       Version:(0x"..HEX(version,1)..") "..Integer(version,1))
   index = index + 1
   version = Integer(version,1)
 
   local flags = string.sub(data,index + 1,index + 3)
   flags = "0x"..HEX(flags,3)
-  result = result.."       Flag:"..flags.."\r\n"
+  table.insert(result , "       Flag:"..flags)
   index = index + 3
   --Box Data
   sample_size = string.sub(data,index + 1,index + 4)
   index = index + 4
-  result = result.."       sample_size: (0x"..HEX(sample_size,4)..") "..Integer(sample_size,4).."\r\n"
+  table.insert(result , "       sample_size: (0x"..HEX(sample_size,4)..") "..Integer(sample_size,4))
   sample_size = Integer(sample_size,4)
-  
+
   sample_count = string.sub(data,index + 1,index + 4)
   index = index + 4
-  result = result.."       sample_count: (0x"..HEX(sample_count,4)..") "..Integer(sample_count,4).."\r\n"
+  table.insert(result , "       sample_count: (0x"..HEX(sample_count,4)..") "..Integer(sample_count,4))
   sample_count = Integer(sample_count,4)
 
   if sample_size == 0 then
     for i = 1,sample_count do
       entry_size = string.sub(data,index + 1,index + 4)
       index = index + 4
-      result = result.."       entry_size: (0x"..HEX(entry_size,4)..") "..Integer(entry_size,4).."\r\n"
+      table.insert(result , "       entry_size: (0x"..HEX(entry_size,4)..") "..Integer(entry_size,4))
     end
   end
   -- -- result = result.."       index:"..index.." size:"..size.."\r\n"
-  result = result.."----------------------------------------------------------------\r\n"
-  result = result.."讲解地址\r\n"
-  result = result.."http://l.web.umkc.edu/lizhu/teaching/2016sp.video-communication/ref/mp4.pdf\r\n"
-  return {result}
+  table.insert(result , "----------------------------------------------------------------")
+  table.insert(result , "讲解地址:")
+  table.insert(result , "http://l.web.umkc.edu/lizhu/teaching/2016sp.video-communication/ref/mp4.pdf")
+  return {table.concat(result,"\r\n")}
 end
 
 function parse(name,data)

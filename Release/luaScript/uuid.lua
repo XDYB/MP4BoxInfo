@@ -1,3 +1,4 @@
+
 function RawWrite(name,data)
   local filename = "./luaScript/data/"..name..".raw";
 	local file = io.open(filename, "wb");
@@ -41,36 +42,28 @@ end
 
 function Parse(name,data)
   local size = string.len(data)
-  local result = {}
+  local result = ""
+  --Full Box
   --Box Header
   local index = 8
-  local version = string.sub(data,index + 1,index + 1);
-  table.insert(result , "       Version:(0x"..HEX(version,1)..") "..Integer(version,1))
-  index = index + 1
-  version = Integer(version,1)
-
-  local flags = string.sub(data,index + 1,index + 3)
-  flags = "0x"..HEX(flags,3)
-  table.insert(result , "       Flag:"..flags)
-  index = index + 3
   --Box Data
-  entry_count = string.sub(data,index + 1,index + 4)
-  index = index + 4
-  table.insert(result , "       entry_count: (0x"..HEX(entry_count,4)..") "..Integer(entry_count,4))
-  entry_count = Integer(entry_count,4)
+  result = result.."Box Data:\r\n"
 
+  uuid = string.sub(data,index + 1,index + 16)
+  index = index + 16
+  result = result.."       uuid: (0x"..HEX(uuid,16)..") ".."\r\n"
 
-  for i = 1,entry_count do
-    sample_number = string.sub(data,index + 1,index + 4)
-    index = index + 4
-    table.insert(result , "       sample_number: (0x"..HEX(sample_number,4)..") "..Integer(sample_number,4))
-  end
-
-  -- -- result = result.."       index:"..index.." size:"..size.."\r\n"
-  table.insert(result , "----------------------------------------------------------------")
-  table.insert(result , "讲解地址:")
-  table.insert(result , "http://l.web.umkc.edu/lizhu/teaching/2016sp.video-communication/ref/mp4.pdf")
-  return {table.concat(result,"\r\n")}
+  data  = string.sub(data,index + 1,size)
+  result = result.."       size: "..string.len(data).."\r\n"
+  result = result.."       data: ".."\r\n"..data.."\r\n"
+  -- result = result.."       index:"..index.." size:"..size.."\r\n"
+  result = result.."\r\n----------------------------------------------------------------\r\n"
+  result = result.."讲解地址\r\n"
+  result = result.."http://l.web.umkc.edu/lizhu/teaching/2016sp.video-communication/ref/mp4.pdf\r\n"
+  result = result.."http://blog.chinaunix.net/uid-20424888-id-3190160.html\r\n"
+  result = result.."http://blog.csdn.net/dxpqxb/article/details/42266811\r\n"
+  result = result.."http://blog.csdn.net/pirateleo/article/details/7590056/\r\n"
+  return {result}
 end
 
 function parse(name,data)
@@ -78,6 +71,6 @@ function parse(name,data)
   return Parse(name,data)
 end
 
-local name = "stss"
+local name = "uuid"
 -- local data = RawRead(name)
--- print(Parse(name,data)[1])
+-- Parse(name,data)
