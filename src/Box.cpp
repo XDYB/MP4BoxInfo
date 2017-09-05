@@ -28,7 +28,8 @@ Box *Box::load(Stream &fs, uint64_t iPos, uint64_t iEnd)
 
 	if (iPos + iSize > iEnd) {
 		std::cerr << "Error: Leaf box size exceeds bounds." << std::endl;
-		return NULL;
+		//return NULL;
+		iSize = iEnd - iPos;
 	}
 
 	Box *newBox = new Box();
